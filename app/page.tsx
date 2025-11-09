@@ -19,14 +19,14 @@ export default function Home() {
           <button
             type="button"
             onClick={()=> router.push("/login")}
-            className="px-8 py-3 rounded-lg font-medium bg-indigo-600 text-white shadow-md hover:bg-indigo-700 transition-all"
+            className="cursor-pointer px-8 py-3 rounded-lg font-medium bg-indigo-600 text-white shadow-md hover:bg-indigo-700 transition-all"
           >
             Login
           </button>
           <button
             type="button"
             onClick={()=> router.push("/register")}
-            className="px-8 py-3 rounded-lg font-medium bg-white border border-indigo-600 text-indigo-600 shadow hover:bg-indigo-50 transition-all"
+            className="cursor-pointer px-8 py-3 rounded-lg font-medium bg-white border border-indigo-600 text-indigo-600 shadow hover:bg-indigo-50 transition-all"
           >
             Sign Up
           </button>
