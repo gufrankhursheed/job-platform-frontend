@@ -87,6 +87,10 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:5014/api/auth/google";
+  };
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-800 p-6">
       <section className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
@@ -163,6 +167,22 @@ export default function LoginPage() {
             Sign Up here
           </button>
         </p>
+
+        <div className="mt-6 flex flex-col items-center">
+          <p className="text-gray-500 mb-2">Or login with</p>
+          <button
+            onClick={handleGoogleLogin}
+            disabled={!!loading}
+            className="cursor-pointer flex items-center justify-center gap-2 w-full py-3 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 transition-colors"
+          >
+            <img
+              src="https://developers.google.com/identity/images/g-logo.png"
+              alt="Google Logo"
+              className="w-5 h-5"
+            />
+            <span className="font-semibold text-gray-700">Login with Google</span>
+          </button>
+        </div>
       </section>
     </main>
   );
