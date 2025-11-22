@@ -8,14 +8,12 @@ interface User {
 
 interface AuthSlice {
     user: User | null;
-    token: string | null;
     loading: boolean | null;
     error: string | null;
 }
 
 const initialState: AuthSlice = {
     user: null,
-    token: null,
     loading: null,
     error: null
 }
@@ -30,11 +28,10 @@ const authSlice = createSlice({
         },
         loginSuccess: (
             state,
-            action: PayloadAction<{ user: User, token: string}>
+            action: PayloadAction<{ user: User}>
         ) => {
             state.loading = false;
             state.user = action.payload.user;
-            state.token = action.payload.token
         },
         loginFailure: ( 
             state,
@@ -44,8 +41,7 @@ const authSlice = createSlice({
             state.error = action.payload
         },
         logout : state => {
-            state.user = null,
-            state.token = null
+            state.user = null;
         }
     }
 })

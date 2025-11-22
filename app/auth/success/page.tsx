@@ -1,57 +1,89 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useRouter, useSearchParams } from "next/navigation";
 import { loginSuccess } from "@/redux/slices/authSlice";
+import { useRouter } from "next/navigation";
 
-export default function AuthSuccessPage() {
+export default function GoogleSuccessPage() {
   const dispatch = useDispatch();
   const router = useRouter();
-  const searchParams = useSearchParams();
+
+  const [status, setStatus] = useState<"loading" | "error">("loading");
 
   useEffect(() => {
-    // 1️⃣ Extract token & user from query string
-    const token = searchParams.get("token");
-    const userString = searchParams.get("user");
+    async function completeGoogleLogin() {
+      try {
+        // Fetch authenticated user using cookies
+        const res = await fetch(
+          "http://localhost:5014/api/auth/getCurrentUser",
+          {
+            method: "GET",
+            credentials: "include", // important
+          }
+        );
 
-    if (!token || !userString) {
-      console.error("Missing token or user data in URL");
-      router.replace("/login");
-      return;
-    }
+        if (!res.ok) throw new Error("Failed to fetch user");
 
-    try {
-      // 2️⃣ Decode the user JSON
-      const user = JSON.parse(decodeURIComponent(userString));
+        const user = await res.json();
 
-      // 3️⃣ Dispatch Redux loginSuccess
-      dispatch(loginSuccess({ user, token }));
+        dispatch(loginSuccess({ user }));
 
-      // 4️⃣ Redirect based on role
-      if (user.role === "candidate") {
-        router.replace("/candidate/dashboard");
-      } else if (user.role === "recruiter") {
-        router.replace("/recruiter/dashboard");
-      } else {
-        router.replace("/dashboard");
+        // Redirect based on role
+        if (user.role === "candidate") {
+          router.replace("/candidate/dashboard");
+        } else if (user.role === "recruiter") {
+          router.replace("/recruiter/dashboard");
+        } else {
+          router.replace("/dashboard");
+        }
+      } catch (err) {
+        console.log("OAuth success error:", err);
+        setStatus("error");
+
+        // Redirect after slight delay so user sees message
+        setTimeout(() => {
+          router.replace("/login");
+        }, 2000);
       }
-    } catch (error) {
-      console.error("Failed to parse user data:", error);
-      router.replace("/login");
     }
-  }, [dispatch, router, searchParams]);
+
+    completeGoogleLogin();
+  }, []);
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-700">
-      <div className="bg-white p-6 rounded-lg shadow-md text-center">
-        <h1 className="text-2xl font-semibold text-indigo-600 mb-2">
-          Logging you in...
-        </h1>
-        <p className="text-gray-500">
-          Please wait while we finish authentication.
-        </p>
-      </div>
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-800 p-6">
+      <section className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+        {status === "loading" && (
+          <>
+            <h1 className="text-2xl font-extrabold text-indigo-600 mb-4">
+              Logging you in...
+            </h1>
+            <p className="text-gray-600 mb-4">
+              Please wait while we verify your Google account.
+            </p>
+
+            <div className="flex justify-center mt-4">
+              <div className="w-10 h-10 border-4 border-indigo-300 border-t-indigo-600 rounded-full animate-spin"></div>
+            </div>
+          </>
+        )}
+
+        {status === "error" && (
+          <>
+            <h1 className="text-2xl font-extrabold text-red-600 mb-4">
+              Login Failed
+            </h1>
+            <p className="text-gray-600 mb-4">
+              Something went wrong while logging in with Google.
+            </p>
+
+            <div className="text-gray-500 text-sm">
+              Redirecting you back to login...
+            </div>
+          </>
+        )}
+      </section>
     </main>
   );
 }

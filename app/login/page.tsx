@@ -62,6 +62,7 @@ export default function LoginPage() {
           email: form.identifier,
           password: form.password,
         }),
+        credentials: "include",
       });
 
       const data = await response.json();
@@ -72,7 +73,7 @@ export default function LoginPage() {
       }
 
       dispatch(
-        loginSuccess({ user: data.loggedInUser, token: data.accessToken })
+        loginSuccess({ user: data.loggedInUser})
       );
 
       if (data.loggedInUser.role === "candidate") {
