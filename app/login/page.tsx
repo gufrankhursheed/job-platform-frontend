@@ -9,7 +9,7 @@ import { RootState } from "@/redux/store";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { apiFetch } from "../utils/api";
+import { apiFetch } from "../../utils/api";
 
 interface LoginForm {
   identifier: string;
@@ -17,7 +17,7 @@ interface LoginForm {
 }
 
 export default function LoginPage() {
-  const router = useRouter(); 
+  const router = useRouter();
   const loading = useSelector((state: RootState) => state.auth.loading);
   const error = useSelector((state: RootState) => state.auth.error);
   const dispatch = useDispatch();
@@ -61,8 +61,8 @@ export default function LoginPage() {
           name: form.identifier,
           email: form.identifier,
           password: form.password,
-        })
-      })
+        }),
+      });
 
       const data = await response.json();
 
@@ -71,9 +71,7 @@ export default function LoginPage() {
         return;
       }
 
-      dispatch(
-        loginSuccess({ user: data.loggedInUser})
-      );
+      dispatch(loginSuccess({ user: data.loggedInUser }));
 
       if (data.loggedInUser.role === "candidate") {
         router.push("/candidate/dashboard");
@@ -180,7 +178,9 @@ export default function LoginPage() {
               alt="Google Logo"
               className="w-5 h-5"
             />
-            <span className="font-semibold text-gray-700">Login with Google</span>
+            <span className="font-semibold text-gray-700">
+              Login with Google
+            </span>
           </button>
         </div>
       </section>

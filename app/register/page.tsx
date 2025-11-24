@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useState } from "react";
-import { apiFetch } from "../utils/api";
+import { apiFetch } from "../../utils/api";
 
 interface RegisterForm {
   name: string;
