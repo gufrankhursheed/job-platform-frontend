@@ -9,6 +9,7 @@ import { RootState } from "@/redux/store";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { apiFetch } from "../utils/api";
 
 interface LoginForm {
   identifier: string;
@@ -54,16 +55,14 @@ export default function LoginPage() {
     dispatch(loginStart());
 
     try {
-      const response = await fetch("", {
+      const response = await apiFetch("", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.identifier,
           email: form.identifier,
           password: form.password,
-        }),
-        credentials: "include",
-      });
+        })
+      })
 
       const data = await response.json();
 

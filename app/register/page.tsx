@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useState } from "react";
+import { apiFetch } from "../utils/api";
 
 interface RegisterForm {
   name: string;
@@ -68,9 +69,8 @@ export default function RegisterPage() {
     setApiError(null);
 
     try {
-      const response = await fetch("", {
+      const response = await apiFetch("", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
 
@@ -225,10 +225,11 @@ export default function RegisterPage() {
               alt="Google Logo"
               className="w-5 h-5"
             />
-            <span className="font-semibold text-gray-700">Login with Google</span>
+            <span className="font-semibold text-gray-700">
+              Login with Google
+            </span>
           </button>
         </div>
-
       </section>
     </main>
   );
