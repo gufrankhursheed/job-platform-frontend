@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 export default function useAuth() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.auth);
+  const user = useSelector((state: RootState) => state.auth.user);
 
   useEffect(() => {
     async function loadUser() {
