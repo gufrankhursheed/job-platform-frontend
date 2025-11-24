@@ -214,7 +214,7 @@ export default function RegisterPage() {
         </p>
 
         <div className="mt-6 flex flex-col items-center">
-          <p className="text-gray-500 mb-2">Or login with</p>
+          <p className="text-gray-500 mb-2">Or</p>
           <button
             onClick={handleGoogleLogin}
             disabled={!!loading}
