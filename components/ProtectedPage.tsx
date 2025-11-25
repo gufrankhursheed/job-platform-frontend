@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import useAuth from "../hooks/useAuth";
 import { useRouter } from "next/navigation";
 
@@ -15,19 +15,26 @@ export default function ProtectedPage({
 }: ProtectedRouteProps) {
   const router = useRouter();
   const user = useAuth();
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    if (user && allowedRoles && !allowedRoles.includes(user.role)) {
-      // Redirect to the user's proper dashboard based on role
-      if (user.role) {
-        router.replace(`/${user.role}/dashboard`);
-      } else {
-        router.replace("/login");
-      }
+    if (!user) return; // still loading
+
+    if (allowedRoles && !allowedRoles.includes(user.role)) {
+      const redirectMap: Record<string, string> = {
+        candidate: "/candidate/dashboard",
+        recruiter: "/recruiter/dashboard"
+      };
+
+      const redirectTo = redirectMap[user.role] || "/login";
+      router.replace(redirectTo);
+    } else {
+      setIsChecking(false);
     }
   }, [user, allowedRoles, router]);
 
-  if (!user) {
+  // Still loading auth OR checking role
+  if (!user || isChecking) {
     return (
       <div className="flex min-h-screen items-center justify-center text-xl">
         Checking authentication...
