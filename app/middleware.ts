@@ -4,11 +4,11 @@ export function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("accessToken")?.value;
   const { pathname } = request.nextUrl;
 
-  const publicRoutes = ["/", "/login", "/registser", "/auth/success"];
+  const publicRoutes = ["/", "/login", "/register", "/auth/success"];
 
-  const isPublicRoute = publicRoutes.some((route) => {
-    pathname.startsWith(route);
-  });
+  const isPublicRoute = publicRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
 
   if (isPublicRoute) {
     return NextResponse.next();
@@ -31,4 +31,3 @@ export const config = {
     "/chat/:path*",
   ],
 };
-

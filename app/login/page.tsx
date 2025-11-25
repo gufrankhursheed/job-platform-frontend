@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { apiFetch } from "../../utils/api";
+import ProtectedAuthPage from "@/components/ProtectedAuthPage";
 
 interface LoginForm {
   identifier: string;
@@ -90,100 +91,102 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-800 p-6">
-      <section className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-extrabold mb-6 text-indigo-600 text-center">
-          Login to Your Account
-        </h1>
+    <ProtectedAuthPage>
+      <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-800 p-6">
+        <section className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+          <h1 className="text-3xl font-extrabold mb-6 text-indigo-600 text-center">
+            Login to Your Account
+          </h1>
 
-        {error && (
-          <div className="bg-red-100 text-red-700 px-4 py-2 mb-4 rounded">
-            {error}
-          </div>
-        )}
+          {error && (
+            <div className="bg-red-100 text-red-700 px-4 py-2 mb-4 rounded">
+              {error}
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="mb-4">
-            <label htmlFor="identifier" className="block font-semibold mb-1">
-              Username or Email
-            </label>
-            <input
-              id="identifier"
-              name="identifier"
-              type="text"
-              value={form.identifier}
-              onChange={handleChange}
-              className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
-                errors.identifier ? "border-red-500" : "border-gray-300"
-              }`}
-              placeholder="Enter username or email"
+          <form onSubmit={handleSubmit} noValidate>
+            <div className="mb-4">
+              <label htmlFor="identifier" className="block font-semibold mb-1">
+                Username or Email
+              </label>
+              <input
+                id="identifier"
+                name="identifier"
+                type="text"
+                value={form.identifier}
+                onChange={handleChange}
+                className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
+                  errors.identifier ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="Enter username or email"
+                disabled={!!loading}
+              />
+              {errors.identifier && (
+                <p className="text-sm text-red-600 mt-1">{errors.identifier}</p>
+              )}
+            </div>
+
+            <div className="mb-6">
+              <label htmlFor="password" className="block font-semibold mb-1">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                value={form.password}
+                onChange={handleChange}
+                className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
+                  errors.password ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="Enter your password"
+                disabled={!!loading}
+              />
+              {errors.password && (
+                <p className="text-sm text-red-600 mt-1">{errors.password}</p>
+              )}
+            </div>
+
+            <button
+              type="submit"
               disabled={!!loading}
-            />
-            {errors.identifier && (
-              <p className="text-sm text-red-600 mt-1">{errors.identifier}</p>
-            )}
-          </div>
+              className="cursor-pointer w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
+            >
+              {loading ? "Logging in..." : "Login"}
+            </button>
+          </form>
 
-          <div className="mb-6">
-            <label htmlFor="password" className="block font-semibold mb-1">
-              Password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              value={form.password}
-              onChange={handleChange}
-              className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
-                errors.password ? "border-red-500" : "border-gray-300"
-              }`}
-              placeholder="Enter your password"
+          <p className="mt-6 text-center text-gray-600">
+            Don't have an account?{" "}
+            <button
+              type="button"
               disabled={!!loading}
-            />
-            {errors.password && (
-              <p className="text-sm text-red-600 mt-1">{errors.password}</p>
-            )}
+              className="cursor-pointer text-indigo-600 font-semibold hover:underline"
+              onClick={() => router.push("/register")}
+            >
+              Sign Up here
+            </button>
+          </p>
+
+          <div className="mt-6 flex flex-col items-center">
+            <p className="text-gray-500 mb-2">Or</p>
+            <button
+              onClick={handleGoogleLogin}
+              disabled={!!loading}
+              className="cursor-pointer flex items-center justify-center gap-2 w-full py-3 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 transition-colors"
+            >
+              <img
+                src="https://developers.google.com/identity/images/g-logo.png"
+                alt="Google Logo"
+                className="w-5 h-5"
+              />
+              <span className="font-semibold text-gray-700">
+                Login with Google
+              </span>
+            </button>
           </div>
-
-          <button
-            type="submit"
-            disabled={!!loading}
-            className="cursor-pointer w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors"
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-gray-600">
-          Don't have an account?{" "}
-          <button
-            type="button"
-            disabled={!!loading}
-            className="cursor-pointer text-indigo-600 font-semibold hover:underline"
-            onClick={() => router.push("/register")}
-          >
-            Sign Up here
-          </button>
-        </p>
-
-        <div className="mt-6 flex flex-col items-center">
-          <p className="text-gray-500 mb-2">Or</p>
-          <button
-            onClick={handleGoogleLogin}
-            disabled={!!loading}
-            className="cursor-pointer flex items-center justify-center gap-2 w-full py-3 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 transition-colors"
-          >
-            <img
-              src="https://developers.google.com/identity/images/g-logo.png"
-              alt="Google Logo"
-              className="w-5 h-5"
-            />
-            <span className="font-semibold text-gray-700">
-              Login with Google
-            </span>
-          </button>
-        </div>
-      </section>
-    </main>
+        </section>
+      </main>
+    </ProtectedAuthPage>
   );
 }

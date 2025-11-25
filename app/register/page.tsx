@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { apiFetch } from "../../utils/api";
+import ProtectedAuthPage from "@/components/ProtectedAuthPage";
 
 interface RegisterForm {
   name: string;
@@ -93,144 +94,146 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-800 p-6">
-      <section className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-extrabold mb-6 text-indigo-600 text-center">
-          Create an Account
-        </h1>
+    <ProtectedAuthPage>
+      <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-800 p-6">
+        <section className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+          <h1 className="text-3xl font-extrabold mb-6 text-indigo-600 text-center">
+            Create an Account
+          </h1>
 
-        {apiError && (
-          <p className="bg-red-100 text-red-700 px-4 py-2 mb-4 rounded">
-            {apiError}
-          </p>
-        )}
+          {apiError && (
+            <p className="bg-red-100 text-red-700 px-4 py-2 mb-4 rounded">
+              {apiError}
+            </p>
+          )}
 
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="mb-4">
-            <label htmlFor="name" className="block font-semibold mb-1">
-              Full Name
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              value={form.name}
-              onChange={handleChange}
-              className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
-                errors.name ? "border-red-500" : "border-gray-300"
-              }`}
-              placeholder="Your full name"
+          <form onSubmit={handleSubmit} noValidate>
+            <div className="mb-4">
+              <label htmlFor="name" className="block font-semibold mb-1">
+                Full Name
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                value={form.name}
+                onChange={handleChange}
+                className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
+                  errors.name ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="Your full name"
+                disabled={loading}
+              />
+              {errors.name && (
+                <p className="text-sm text-red-600 mt-1">{errors.name}</p>
+              )}
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="email" className="block font-semibold mb-1">
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
+                  errors.email ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="you@example.com"
+                disabled={loading}
+              />
+              {errors.email && (
+                <p className="text-sm text-red-600 mt-1">{errors.email}</p>
+              )}
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="password" className="block font-semibold mb-1">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                value={form.password}
+                onChange={handleChange}
+                className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
+                  errors.password ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="Enter a secure password"
+                disabled={loading}
+              />
+              {errors.password && (
+                <p className="text-sm text-red-600 mt-1">{errors.password}</p>
+              )}
+            </div>
+
+            <div className="mb-6">
+              <label htmlFor="role" className="block font-semibold mb-1">
+                Role
+              </label>
+              <select
+                id="role"
+                name="role"
+                value={form.role}
+                onChange={handleChange}
+                className={`w-full border rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
+                  errors.role ? "border-red-500" : "border-gray-300"
+                }`}
+                disabled={loading}
+              >
+                <option value="">Select Role</option>
+                <option value="candidate">Candidate</option>
+                <option value="recruiter">Recruiter</option>
+              </select>
+              {errors.role && (
+                <p className="text-sm text-red-600 mt-1">{errors.role}</p>
+              )}
+            </div>
+
+            <button
+              type="submit"
               disabled={loading}
-            />
-            {errors.name && (
-              <p className="text-sm text-red-600 mt-1">{errors.name}</p>
-            )}
-          </div>
+              className="cursor-pointer w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors disabled:opacity-50"
+            >
+              {loading ? "Registering..." : "Create Account"}
+            </button>
+          </form>
 
-          <div className="mb-4">
-            <label htmlFor="email" className="block font-semibold mb-1">
-              Email
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
-                errors.email ? "border-red-500" : "border-gray-300"
-              }`}
-              placeholder="you@example.com"
-              disabled={loading}
-            />
-            {errors.email && (
-              <p className="text-sm text-red-600 mt-1">{errors.email}</p>
-            )}
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="password" className="block font-semibold mb-1">
-              Password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              value={form.password}
-              onChange={handleChange}
-              className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
-                errors.password ? "border-red-500" : "border-gray-300"
-              }`}
-              placeholder="Enter a secure password"
-              disabled={loading}
-            />
-            {errors.password && (
-              <p className="text-sm text-red-600 mt-1">{errors.password}</p>
-            )}
-          </div>
-
-          <div className="mb-6">
-            <label htmlFor="role" className="block font-semibold mb-1">
-              Role
-            </label>
-            <select
-              id="role"
-              name="role"
-              value={form.role}
-              onChange={handleChange}
-              className={`w-full border rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
-                errors.role ? "border-red-500" : "border-gray-300"
-              }`}
+          <p className="mt-6 text-center text-gray-600">
+            Already have an account?{" "}
+            <button
+              type="button"
+              className="cursor-pointer text-indigo-600 font-semibold hover:underline"
+              onClick={() => router.push("/login")}
               disabled={loading}
             >
-              <option value="">Select Role</option>
-              <option value="candidate">Candidate</option>
-              <option value="recruiter">Recruiter</option>
-            </select>
-            {errors.role && (
-              <p className="text-sm text-red-600 mt-1">{errors.role}</p>
-            )}
+              Login here
+            </button>
+          </p>
+
+          <div className="mt-6 flex flex-col items-center">
+            <p className="text-gray-500 mb-2">Or</p>
+            <button
+              onClick={handleGoogleLogin}
+              disabled={!!loading}
+              className="cursor-pointer flex items-center justify-center gap-2 w-full py-3 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 transition-colors"
+            >
+              <img
+                src="https://developers.google.com/identity/images/g-logo.png"
+                alt="Google Logo"
+                className="w-5 h-5"
+              />
+              <span className="font-semibold text-gray-700">
+                Login with Google
+              </span>
+            </button>
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="cursor-pointer w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition-colors disabled:opacity-50"
-          >
-            {loading ? "Registering..." : "Create Account"}
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-gray-600">
-          Already have an account?{" "}
-          <button
-            type="button"
-            className="cursor-pointer text-indigo-600 font-semibold hover:underline"
-            onClick={() => router.push("/login")}
-            disabled={loading}
-          >
-            Login here
-          </button>
-        </p>
-
-        <div className="mt-6 flex flex-col items-center">
-          <p className="text-gray-500 mb-2">Or</p>
-          <button
-            onClick={handleGoogleLogin}
-            disabled={!!loading}
-            className="cursor-pointer flex items-center justify-center gap-2 w-full py-3 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 transition-colors"
-          >
-            <img
-              src="https://developers.google.com/identity/images/g-logo.png"
-              alt="Google Logo"
-              className="w-5 h-5"
-            />
-            <span className="font-semibold text-gray-700">
-              Login with Google
-            </span>
-          </button>
-        </div>
-      </section>
-    </main>
+        </section>
+      </main>
+    </ProtectedAuthPage>
   );
 }
