@@ -10,7 +10,7 @@ export default function ProtectedAuthPage({
   children: ReactNode;
 }) {
   const router = useRouter();
-  const user = useAuth();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     if (!user) return;
@@ -24,13 +24,21 @@ export default function ProtectedAuthPage({
     }
   }, [user]);
 
-  if (user) {
+  if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-xl">
-        Redirecting...
-      </div>
+      <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-800 p-6">
+        <section className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <h1 className="text-xl font-semibold text-indigo-600">
+            Checking authentication...
+          </h1>
+        </section>
+      </main>
     );
   }
 
-  return <>{children}</>;
+  if (!user && !loading) {
+    return <>{children}</>;
+  }
+
+  return null;
 }

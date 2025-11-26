@@ -2,18 +2,20 @@
 
 import { loginSuccess, logout } from "@/redux/slices/authSlice";
 import { RootState } from "@/redux/store";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function useAuth() {
-  const router = useRouter();
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadUser() {
-      if (user) return user;
+      if (user) {
+        setLoading(false);
+        return;
+      }
 
       try {
         const response = await fetch(
@@ -30,12 +32,13 @@ export default function useAuth() {
         dispatch(loginSuccess({ user: data }));
       } catch (error) {
         dispatch(logout());
-        router.replace("/login");
+      } finally {
+        setLoading(false);
       }
     }
 
-    loadUser()
+    loadUser();
   }, []);
 
-  return user;
+  return { user, loading };
 }

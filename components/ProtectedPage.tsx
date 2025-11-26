@@ -14,16 +14,21 @@ export default function ProtectedPage({
   allowedRoles,
 }: ProtectedRouteProps) {
   const router = useRouter();
-  const user = useAuth();
+  const { user, loading } = useAuth();
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    if (!user) return; // still loading
+    if (loading) return; // still loading, pause logic
 
+    if (!user) {
+      // Not authenticated, redirect to login
+      router.replace("/login");
+      return;
+    }
     if (allowedRoles && !allowedRoles.includes(user.role)) {
       const redirectMap: Record<string, string> = {
         candidate: "/candidate/dashboard",
-        recruiter: "/recruiter/dashboard"
+        recruiter: "/recruiter/dashboard",
       };
 
       const redirectTo = redirectMap[user.role] || "/login";
@@ -31,14 +36,18 @@ export default function ProtectedPage({
     } else {
       setIsChecking(false);
     }
-  }, [user, allowedRoles, router]);
+  }, [user, loading, allowedRoles, router]);
 
   // Still loading auth OR checking role
-  if (!user || isChecking) {
+  if (loading || !user || isChecking) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-xl">
-        Checking authentication...
-      </div>
+      <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-800 p-6">
+        <section className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <h1 className="text-xl font-semibold text-indigo-600">
+            Checking authentication...
+          </h1>
+        </section>
+      </main>
     );
   }
 
