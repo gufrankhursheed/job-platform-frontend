@@ -19,7 +19,7 @@ export default function useAuth() {
 
       try {
         const response = await fetch(
-          "http://localhost:5014/api/auth/getCurrentUser",
+          "http://localhost:5000/api/user/current-user",
           {
             credentials: "include",
           }
@@ -29,7 +29,7 @@ export default function useAuth() {
 
         const data = await response.json();
 
-        dispatch(loginSuccess({ user: data }));
+        dispatch(loginSuccess({ user: data.user }));
       } catch (error) {
         dispatch(logout());
       } finally {

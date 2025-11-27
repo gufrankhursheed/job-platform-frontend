@@ -1,7 +1,7 @@
 import { logout } from "@/redux/slices/authSlice";
 import { redirect } from "next/navigation";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5014/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 export async function apiFetch(endpoint: string, options: RequestInit) {
 

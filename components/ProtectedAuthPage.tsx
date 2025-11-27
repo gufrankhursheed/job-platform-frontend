@@ -19,8 +19,6 @@ export default function ProtectedAuthPage({
       router.replace("/candidate/dashboard");
     } else if (user.role === "recruiter") {
       router.replace("/recruiter/dashboard");
-    } else {
-      router.replace("/dashboard");
     }
   }, [user]);
 
