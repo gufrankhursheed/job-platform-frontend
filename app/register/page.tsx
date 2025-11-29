@@ -70,7 +70,7 @@ export default function RegisterPage() {
     setApiError(null);
 
     try {
-      const response = await apiFetch("", {
+      const response = await apiFetch("user/register", {
         method: "POST",
         body: JSON.stringify(form),
       });

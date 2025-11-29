@@ -56,7 +56,7 @@ export default function LoginPage() {
     dispatch(loginStart());
 
     try {
-      const response = await apiFetch("", {
+      const response = await apiFetch("user/login", {
         method: "POST",
         body: JSON.stringify({
           name: form.identifier,
