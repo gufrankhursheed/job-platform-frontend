@@ -14,7 +14,6 @@ export default function NavbarWrapper({
   const pathname = usePathname();
   const user = useAuth();
 
-  // From Redux: global unread messages count (Day 6 logic)
   const unreadMessages = useSelector((state: RootState) => state.chat.unreadCount ?? 0);
 
   // Pages where navbar must NOT appear

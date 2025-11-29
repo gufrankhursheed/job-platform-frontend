@@ -2,25 +2,18 @@
 
 import { FiBriefcase, FiCalendar, FiBookmark} from "react-icons/fi";
 import DashboardCard from "./DashboardCard";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { useRouter } from "next/navigation";
 
-interface StatsGridProps {
-  applications: number;
-  interviews: number;
-  savedJobs: number;
 
-  onViewApplications: () => void;
-  onViewInterviews: () => void;
-  onViewSavedJobs: () => void;
-}
+export default function StatsGrid() {
+  const router = useRouter();
 
-export default function StatsGrid({
-  applications,
-  interviews,
-  savedJobs,
-  onViewApplications,
-  onViewInterviews,
-  onViewSavedJobs,
-}: StatsGridProps) {
+  const applications = useSelector((state: RootState) => state.applications.applicationsCount);
+  const interviews = useSelector((state: RootState) => state.interview.interviewsCount);
+  const savedJobs = useSelector((state: RootState) => state.jobs.savedJobsCount);
+
   return (
     <div className="flex flex-col gap-6">
       <DashboardCard
@@ -28,7 +21,7 @@ export default function StatsGrid({
         value={applications}
         icon={<FiBriefcase />}
         buttonLabel="View All Applications"
-        onClick={onViewApplications}
+        onClick={() => router.push("/candidate/applications")}
       />
 
       <DashboardCard
@@ -36,7 +29,7 @@ export default function StatsGrid({
         value={interviews}
         icon={<FiCalendar />}
         buttonLabel="View All Interviews"
-        onClick={onViewInterviews}
+        onClick={() => router.push("/candidate/interviews")}
       />
 
       <DashboardCard
@@ -44,7 +37,7 @@ export default function StatsGrid({
         value={savedJobs}
         icon={<FiBookmark/>}
         buttonLabel="View savedJobs"
-        onClick={onViewSavedJobs}
+        onClick={() => router.push("/candidate/saved-jobs")}
       />
     </div>
   );

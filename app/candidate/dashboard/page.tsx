@@ -17,11 +17,6 @@ export default function CandidateDashboard() {
   const router = useRouter();
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
-  const applications = useSelector((state: RootState) => state.applications.applicationsCount);
-  const interviews = useSelector((state: RootState) => state.interview.interviewsCount);
-  const savedJobs = useSelector((state: RootState) => state.jobs.savedJobsCount);
-  const unreadMessages = useSelector((state: RootState) => state.chat.unreadCount);
-
 
   const [loading, setLoading] = useState(true);
 
@@ -136,14 +131,7 @@ export default function CandidateDashboard() {
 
           {/* RIGHT — Stats Grid */}
           <div>
-            <StatsGrid
-              applications={applications}
-              interviews={interviews}
-              savedJobs={savedJobs}
-              onViewApplications={() => router.push("/candidate/applications")}
-              onViewInterviews={() => router.push("/candidate/interviews")}
-              onViewSavedJobs={() => router.push("/candidate/saved-jobs")}
-            />
+            <StatsGrid />
           </div>
         </div>
       </main>
