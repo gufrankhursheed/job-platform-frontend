@@ -7,11 +7,11 @@ import { RootState } from "@/redux/store";
 import { useRouter } from "next/navigation";
 
 
-export default function StatsGrid() {
+export default function CandidateStatsGrid() {
   const router = useRouter();
 
   const applications = useSelector((state: RootState) => state.applications.applicationsCount);
-  const interviews = useSelector((state: RootState) => state.interview.interviewsCount);
+  const interviews = useSelector((state: RootState) => state.interview.candidateInterviewsCount);
   const savedJobs = useSelector((state: RootState) => state.jobs.savedJobsCount);
 
   return (

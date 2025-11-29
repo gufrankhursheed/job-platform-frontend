@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import StatsGrid from "@/components/dashboard/StatsGrid";
+import StatsGrid from "@/components/dashboard/CandidateStatsGrid";
 import ProtectedPage from "@/components/ProtectedPage";
 import { apiFetch } from "@/utils/api";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { setApplicationsCount } from "@/redux/slices/applicationsSlice";
-import { setInterviewsCount } from "@/redux/slices/interviewSlice";
+import { setCandidateInterviewsCount } from "@/redux/slices/interviewSlice";
 import { setSavedJobsCount } from "@/redux/slices/jobsSlice";
 import { RootState } from "@/redux/store";
 import { setUnreadCount } from "@/redux/slices/chatSlice";
@@ -61,7 +61,7 @@ export default function CandidateDashboard() {
         setJobs(jobs.jobs || []);
 
         dispatch(setApplicationsCount(applicationCount));
-        dispatch(setInterviewsCount(interviewCount));
+        dispatch(setCandidateInterviewsCount(interviewCount));
         dispatch(setUnreadCount(unreadMessagesCount))
         dispatch(setSavedJobsCount(savedJobsCount))
       } catch (err) {
