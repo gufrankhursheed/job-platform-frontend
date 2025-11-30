@@ -10,7 +10,7 @@ export default function RecentApplicants() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await apiFetch("", {
+        const res = await apiFetch("application/recruiter/recent-applicants?limit=5", {
           method: "GET",
         });
         const data = await res.json();

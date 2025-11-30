@@ -16,7 +16,7 @@ export default function RecruiterStatsGrid() {
   return (
     <div className="flex flex-col gap-6">
       <DashboardCard
-        title="Jobs Posted"
+        title="Active Jobs Posted"
         value={jobs}
         icon={<FiBriefcase />}
         buttonLabel="Mange Jobs"

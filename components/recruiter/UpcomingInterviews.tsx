@@ -10,7 +10,7 @@ export default function UpcomingInterviews() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await apiFetch("", {
+        const res = await apiFetch("interview/recruiter/upcoming?limit=5", {
           method: "GET",
         });
         const data = await res.json();

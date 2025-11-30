@@ -3,14 +3,17 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/utils/api";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 export default function ActiveJobs() {
   const [jobs, setJobs] = useState([]);
+  const user = useSelector((state: RootState) => state.auth.user);
 
   useEffect(() => {
     async function load() {
       try {
-        const res = await apiFetch("", { method: "GET" });
+        const res = await apiFetch(`job/employer/${user?.id}?limit=5`, { method: "GET" });
         const data = await res.json();
 
         setJobs(data.jobs || []);
