@@ -9,6 +9,7 @@ import { addAppliedJob } from "@/redux/slices/applicationsSlice";
 import { addSavedJob, removeSavedJob } from "@/redux/slices/jobsSlice";
 
 import { FiSave, FiCheck, FiSend } from "react-icons/fi";
+import ProtectedPage from "@/components/ProtectedPage";
 
 export default function JobDetailsPage() {
   const { jobId } = useParams();
@@ -121,93 +122,97 @@ export default function JobDetailsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md border border-gray-200 p-8">
-        {/* Job Header */}
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-extrabold text-indigo-700">
-              {job.title}
-            </h1>
+    <ProtectedPage allowedRoles={["candidate"]}>
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+        <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md border border-gray-200 p-8">
+          {/* Job Header */}
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-extrabold text-indigo-700">
+                {job.title}
+              </h1>
 
-            <p className="text-gray-600 mt-1">{job.companyName}</p>
-            <p className="text-sm text-gray-500 mt-1">
-              {job.location} • {job.remote ? "Remote" : "Onsite"}
+              <p className="text-gray-600 mt-1">{job.companyName}</p>
+              <p className="text-sm text-gray-500 mt-1">
+                {job.location} • {job.remote ? "Remote" : "Onsite"}
+              </p>
+
+              {job.salaryRange && (
+                <p className="text-gray-500 mt-1">Salary: {job.salaryRange}</p>
+              )}
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-3">
+              {/* APPLY */}
+              <button
+                onClick={handleApply}
+                disabled={isApplied || applying}
+                className={`px-5 py-2 rounded-lg font-semibold shadow text-white transition flex items-center gap-2 ${
+                  isApplied
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-indigo-600 hover:bg-indigo-700"
+                }`}
+              >
+                {isApplied ? <FiCheck /> : <FiSend />}
+                {isApplied ? "Applied" : applying ? "Applying..." : "Apply Now"}
+              </button>
+
+              {/* SAVE */}
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className={`px-4 py-2 rounded-lg font-semibold shadow flex items-center gap-2 transition ${
+                  isSaved
+                    ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                    : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+                }`}
+              >
+                <FiSave />
+                {saving ? "Saving..." : isSaved ? "Saved" : "Save Job"}
+              </button>
+            </div>
+          </div>
+
+          {/* DESCRIPTION */}
+          <section className="mt-6">
+            <h2 className="text-xl font-bold text-indigo-600 mb-2">
+              Job Description
+            </h2>
+            <p className="text-gray-700 whitespace-pre-line">
+              {job.description}
             </p>
+          </section>
 
-            {job.salaryRange && (
-              <p className="text-gray-500 mt-1">Salary: {job.salaryRange}</p>
-            )}
-          </div>
+          {/* REQUIREMENTS */}
+          {job.requirements?.length > 0 && (
+            <section className="mt-6">
+              <h2 className="text-xl font-bold text-indigo-600 mb-2">
+                Requirements
+              </h2>
+              <ul className="list-disc list-inside text-gray-700 space-y-1">
+                {job.requirements.map((req: string, idx: number) => (
+                  <li key={idx}>{req}</li>
+                ))}
+              </ul>
+            </section>
+          )}
 
-          {/* Buttons */}
-          <div className="flex gap-3">
-            {/* APPLY */}
-            <button
-              onClick={handleApply}
-              disabled={isApplied || applying}
-              className={`px-5 py-2 rounded-lg font-semibold shadow text-white transition flex items-center gap-2 ${
-                isApplied
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-indigo-600 hover:bg-indigo-700"
-              }`}
-            >
-              {isApplied ? <FiCheck /> : <FiSend />}
-              {isApplied ? "Applied" : applying ? "Applying..." : "Apply Now"}
-            </button>
-
-            {/* SAVE */}
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className={`px-4 py-2 rounded-lg font-semibold shadow flex items-center gap-2 transition ${
-                isSaved
-                  ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                  : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
-              }`}
-            >
-              <FiSave />
-              {saving ? "Saving..." : isSaved ? "Saved" : "Save Job"}
-            </button>
-          </div>
+          {/* RESPONSIBILITIES */}
+          {job.responsibilities?.length > 0 && (
+            <section className="mt-6">
+              <h2 className="text-xl font-bold text-indigo-600 mb-2">
+                Responsibilities
+              </h2>
+              <ul className="list-disc list-inside text-gray-700 space-y-1">
+                {job.responsibilities.map((res: string, idx: number) => (
+                  <li key={idx}>{res}</li>
+                ))}
+              </ul>
+            </section>
+          )}
         </div>
-
-        {/* DESCRIPTION */}
-        <section className="mt-6">
-          <h2 className="text-xl font-bold text-indigo-600 mb-2">
-            Job Description
-          </h2>
-          <p className="text-gray-700 whitespace-pre-line">{job.description}</p>
-        </section>
-
-        {/* REQUIREMENTS */}
-        {job.requirements?.length > 0 && (
-          <section className="mt-6">
-            <h2 className="text-xl font-bold text-indigo-600 mb-2">
-              Requirements
-            </h2>
-            <ul className="list-disc list-inside text-gray-700 space-y-1">
-              {job.requirements.map((req: string, idx: number) => (
-                <li key={idx}>{req}</li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        {/* RESPONSIBILITIES */}
-        {job.responsibilities?.length > 0 && (
-          <section className="mt-6">
-            <h2 className="text-xl font-bold text-indigo-600 mb-2">
-              Responsibilities
-            </h2>
-            <ul className="list-disc list-inside text-gray-700 space-y-1">
-              {job.responsibilities.map((res: string, idx: number) => (
-                <li key={idx}>{res}</li>
-              ))}
-            </ul>
-          </section>
-        )}
-      </div>
-    </main>
+      </main>
+    </ProtectedPage>
   );
 }
