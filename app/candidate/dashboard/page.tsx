@@ -7,9 +7,9 @@ import ProtectedPage from "@/components/ProtectedPage";
 import { apiFetch } from "@/utils/api";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-import { setApplicationsCount } from "@/redux/slices/applicationsSlice";
+import { setApplicationsCount, setAppliedJobs } from "@/redux/slices/applicationsSlice";
 import { setCandidateInterviewsCount } from "@/redux/slices/interviewSlice";
-import { setSavedJobsCount } from "@/redux/slices/jobsSlice";
+import { setSavedJobs, setSavedJobsCount } from "@/redux/slices/jobsSlice";
 import { RootState } from "@/redux/store";
 import { setUnreadCount } from "@/redux/slices/chatSlice";
 
@@ -34,6 +34,7 @@ export default function CandidateDashboard() {
       try {
         const app = await apiFetch(`application/candidate/${user?.id}`, { method: "GET" });
         const applications = await app.json();
+        const appliedJobIds = applications.jobs?.map((job: any) => job.id) || [];
         const applicationCount = applications.pagination?.totalItems || 0;
 
         const int = await apiFetch(`interview/candidate/${user?.id}`, { method: "GET" });
@@ -46,7 +47,8 @@ export default function CandidateDashboard() {
 
         const saved = await apiFetch("job/saved", { method: "GET" }); 
         const savedJobs = await saved.json();
-        const savedJobsCount = savedJobs.count || 0;
+        const savedJobIds = savedJobs.savedJobs?.map((job: any) => job.id) || [];
+        const savedJobsCount = savedJobs.pagination?.totalItems || 0;
 
         const jobsList = await apiFetch("jobs?limit=5", { method: "GET" });
         const jobs = await jobsList.json();
@@ -61,9 +63,11 @@ export default function CandidateDashboard() {
         setJobs(jobs.jobs || []);
 
         dispatch(setApplicationsCount(applicationCount));
+        dispatch(setAppliedJobs(appliedJobIds));
         dispatch(setCandidateInterviewsCount(interviewCount));
         dispatch(setUnreadCount(unreadMessagesCount))
         dispatch(setSavedJobsCount(savedJobsCount))
+        dispatch(setSavedJobs(savedJobIds));
       } catch (err) {
         console.log(err);
       } finally {
