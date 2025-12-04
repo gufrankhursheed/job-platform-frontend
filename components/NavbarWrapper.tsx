@@ -24,28 +24,25 @@ export default function NavbarWrapper({
   const shouldHideNavbar = hideOnRoutes.includes(pathname) || !user;
 
   useEffect(() => {
-    try {
-      async function load() {
-      const unread = await apiFetch("chat/unreadCount", { method: "GET" });
-      const unreadMessages = await unread.json();
-      const unreadMessagesCount = unreadMessages.unread || 0;
-
-      dispatch(setUnreadCount(unreadMessagesCount));
+    async function loadUnread() {
+      try {
+        const unread = await apiFetch("chat/unreadCount", { method: "GET" });
+        const unreadMessages = await unread.json();
+        dispatch(setUnreadCount(unreadMessages.unread || 0));
+      } catch (error) {
+        console.log(error);
+      }
     }
 
-    load()
-    } catch (error) {
-       console.log(error);
+    if (!shouldHideNavbar) {
+      loadUnread(); // Fetch unread count on every page navigation
     }
-  }, []);
+  }, [pathname, shouldHideNavbar]);
 
   return (
     <>
       {!shouldHideNavbar && (
-        <Navbar
-          onMessagesClick={() => {}}
-          onProfileClick={() => {}}
-        />
+        <Navbar onMessagesClick={() => {}} onProfileClick={() => {}} />
       )}
 
       {children}
