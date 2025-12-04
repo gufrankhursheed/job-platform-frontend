@@ -41,25 +41,24 @@ export default function SavedJobsPage() {
 
   // REMOVE JOB HANDLER
   async function handleRemove(jobId: string) {
-    try {
-      // Optimistic update for instant UI feedback
-      setSavedJobs((prev) => prev.filter((job: any) => job.id !== jobId));
-      dispatch(removeSavedJob(jobId));
+  try {
+    const prevJobs = savedJobs;
 
-      await apiFetch(`saved-jobs/${jobId}`, {
-        method: "DELETE",
-      });
+    // Optimistic UI
+    setSavedJobs((prev) => prev.filter((job: any) => job.id !== jobId));
+    dispatch(removeSavedJob(jobId));
 
-      // If it was the last item on the page, reload
-      if (savedJobs.length === 1 && page > 1) {
-        setPage(page - 1);
-      } else {
-        loadPage();
-      }
-    } catch (err) {
-      console.log("Failed to remove saved job:", err);
+    await apiFetch(`saved-jobs/${jobId}`, { method: "DELETE" });
+
+    if (prevJobs.length === 1 && page > 1) {
+      setPage(page - 1);
+    } else {
+      loadPage();
     }
+  } catch (err) {
+    console.log("Failed to remove saved job:", err);
   }
+}
 
   return (
     <ProtectedPage allowedRoles={["candidate"]}>
