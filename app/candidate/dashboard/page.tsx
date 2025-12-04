@@ -7,11 +7,9 @@ import ProtectedPage from "@/components/ProtectedPage";
 import { apiFetch } from "@/utils/api";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-import { setApplicationsCount, setAppliedJobs } from "@/redux/slices/applicationsSlice";
-import { setCandidateInterviewsCount } from "@/redux/slices/interviewSlice";
-import { setSavedJobs, setSavedJobsCount } from "@/redux/slices/jobsSlice";
+import { setAppliedJobs } from "@/redux/slices/applicationsSlice";
+import { setSavedJobs } from "@/redux/slices/jobsSlice";
 import { RootState } from "@/redux/store";
-import { setUnreadCount } from "@/redux/slices/chatSlice";
 
 export default function CandidateDashboard() {
   const router = useRouter();
@@ -20,12 +18,11 @@ export default function CandidateDashboard() {
 
   const [loading, setLoading] = useState(true);
 
-  /*const [stats, setStats] = useState({
+  const [stats, setStats] = useState({
     applications: 0,
     interviews: 0,
     savedJobs: 0,        
-    unreadMessages: 0,
-  });*/
+  });
 
   const [jobs, setJobs] = useState([]);
 
@@ -41,10 +38,6 @@ export default function CandidateDashboard() {
         const interviews = await int.json();
         const interviewCount = interviews.pagination?.totalItems || 0;
 
-        const unread = await apiFetch("chat/unreadCount", { method: "GET" });
-        const unreadMessages = await unread.json();
-        const unreadMessagesCount = unreadMessages.unread || 0;
-
         const saved = await apiFetch("job/saved", { method: "GET" }); 
         const savedJobs = await saved.json();
         const savedJobIds = savedJobs.savedJobs?.map((job: any) => job.id) || [];
@@ -53,20 +46,15 @@ export default function CandidateDashboard() {
         const jobsList = await apiFetch("jobs?limit=5", { method: "GET" });
         const jobs = await jobsList.json();
 
-        /*setStats({
+        setStats({
           applications: applicationCount || 0,
           interviews: interviewCount || 0,
-          unreadMessages: unreadMessagesCount || 0,
           savedJobs: savedJobsCount || 0,
-        });*/
+        });
 
         setJobs(jobs.jobs || []);
 
-        dispatch(setApplicationsCount(applicationCount));
         dispatch(setAppliedJobs(appliedJobIds));
-        dispatch(setCandidateInterviewsCount(interviewCount));
-        dispatch(setUnreadCount(unreadMessagesCount))
-        dispatch(setSavedJobsCount(savedJobsCount))
         dispatch(setSavedJobs(savedJobIds));
       } catch (err) {
         console.log(err);
@@ -135,7 +123,11 @@ export default function CandidateDashboard() {
 
           {/* RIGHT — Stats Grid */}
           <div>
-            <StatsGrid />
+            <StatsGrid
+             applications= {stats.applications}
+             interviews =  {stats.interviews}
+             savedJobs= {stats.savedJobs}
+            />
           </div>
         </div>
       </main>
