@@ -2,17 +2,20 @@
 
 import { FiBriefcase, FiCalendar, FiBookmark} from "react-icons/fi";
 import DashboardCard from "./DashboardCard";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
 import { useRouter } from "next/navigation";
 
+interface CandidateStatsGridProps {
+  applications: number,
+  interviews: number,
+  savedJobs: number
+}
 
-export default function CandidateStatsGrid() {
+export default function CandidateStatsGrid({applications, interviews, savedJobs}: CandidateStatsGridProps) {
   const router = useRouter();
 
-  const applications = useSelector((state: RootState) => state.applications.applicationsCount);
-  const interviews = useSelector((state: RootState) => state.interview.candidateInterviewsCount);
-  const savedJobs = useSelector((state: RootState) => state.jobs.savedJobsCount);
+  //const applications = useSelector((state: RootState) => state.applications.applicationsCount);
+  //const interviews = useSelector((state: RootState) => state.interview.candidateInterviewsCount);
+  //const savedJobs = useSelector((state: RootState) => state.jobs.savedJobsCount);
 
   return (
     <div className="flex flex-col gap-6">
