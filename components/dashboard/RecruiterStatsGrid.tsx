@@ -6,11 +6,10 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { FiBriefcase, FiCalendar, FiUsers } from "react-icons/fi";
 
-export default function RecruiterStatsGrid() {
+export default function RecruiterStatsGrid({applicants}: {applicants: number}) {
   const router = useRouter();
 
-  const jobs = useSelector((state: RootState) => state.jobs.totalJobsPosted);
-  const applicants = useSelector((state: RootState) => state.applications.totalApplicants);
+  const jobs = useSelector((state: RootState) => state.jobs.activeJobs.length);
   const interviews = useSelector((state: RootState) => state.interview.recruiterInterviewsCount);
 
   return (
