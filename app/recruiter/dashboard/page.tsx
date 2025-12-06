@@ -10,13 +10,13 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { apiFetch } from "@/utils/api";
 import { RootState } from "@/redux/store";
-import { setTotalJobsPosted } from "@/redux/slices/jobsSlice";
-import { setTotalApplicants } from "@/redux/slices/applicationsSlice";
+import { setRecruiterJobs } from "@/redux/slices/jobsSlice";
 import { setRecruiterInterviewsCount } from "@/redux/slices/interviewSlice";
 
 export default function RecruiterDashboard() {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
+  const [applicantsCount, setApplicantsCount] = useState<number>()
 
   const [loading, setLoading] = useState(true);
 
@@ -25,19 +25,16 @@ export default function RecruiterDashboard() {
       try {
         const jobResponse = await apiFetch(`job/employer/${user?.id}`, { method: "GET" });
         const jobsData = await jobResponse.json();
-        const jobsCount = jobsData?.pagination?.totalItems || 0;
 
         const appResposne = await apiFetch(`application/recruiter/total-applicants`, { method: "GET" });
         const applicantsData = await appResposne.json();
-        const applicantsCount = applicantsData?.count || 0;
+        setApplicantsCount(applicantsData?.count || 0);
 
         const interviewResponse = await apiFetch(`interview/recruiter/upcoming/count`, { method: "GET" });
         const interviewData = await interviewResponse.json();
         const interviewCount = interviewData?.count || 0;
 
-
-        dispatch(setTotalJobsPosted(jobsCount));
-        dispatch(setTotalApplicants(applicantsCount));
+        dispatch(setRecruiterJobs(jobsData.jobs));
         dispatch(setRecruiterInterviewsCount(interviewCount));
       } catch (error) {
         console.log(error);
@@ -79,7 +76,9 @@ export default function RecruiterDashboard() {
 
           {/* RIGHT SECTION */}
           <div>
-            <RecruiterStatsGrid />
+            <RecruiterStatsGrid 
+             applicants={applicantsCount ? applicantsCount : 0} 
+            />
           </div>
         </div>
       </main>
