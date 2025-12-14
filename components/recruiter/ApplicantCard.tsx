@@ -101,6 +101,17 @@ export default function ApplicantCard({ application, onStatusChange }: any) {
         >
           Hire
         </button>
+
+        <button
+          onClick={() =>
+            router.push(
+              `/recruiter/interviews/schedule?candidateId=${application.candidateId}&jobId=${application.jobId}&applicationId=${application.id}`
+            )
+          }
+          className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition"
+        >
+          Schedule Interview
+        </button>
       </div>
     </div>
   );
