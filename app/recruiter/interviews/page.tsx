@@ -83,6 +83,31 @@ export default function RecruiterInterviewsPage() {
     }
   };
 
+  const updateInterviewStatus = async (
+    interviewId: number,
+    status: "completed" | "cancelled"
+  ) => {
+    try {
+      await apiFetch(`/interview/${interviewId}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      });
+
+      // Optimistic UI update
+      setInterviews((prev) =>
+        prev.map((i) => (i.id === interviewId ? { ...i, status } : i))
+      );
+    } catch (err) {
+      alert("Failed to update interview status");
+    }
+  };
+
+  const handleReschedule = (interview: Interview) => {
+    router.push(
+      `/recruiter/interviews/schedule?candidateId=${interview.candidateId}&jobId=${interview.jobId}&applicationId=${interview.applicationId}`
+    );
+  };
+
   return (
     <ProtectedPage allowedRoles={["recruiter"]}>
       <div className="max-w-5xl mx-auto mt-8 p-4">
@@ -188,6 +213,39 @@ export default function RecruiterInterviewsPage() {
                     >
                       View Profile
                     </button>
+
+                    {/* === INTERVIEW ACTIONS (ONLY IF SCHEDULED) === */}
+                    {i.status === "scheduled" && (
+                      <>
+                        {/* Mark Completed */}
+                        <button
+                          onClick={() =>
+                            updateInterviewStatus(i.id, "completed")
+                          }
+                          className="px-3 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200"
+                        >
+                          Mark Completed
+                        </button>
+
+                        {/* Cancel */}
+                        <button
+                          onClick={() =>
+                            updateInterviewStatus(i.id, "cancelled")
+                          }
+                          className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
+                        >
+                          Cancel
+                        </button>
+
+                        {/* Reschedule */}
+                        <button
+                          onClick={() => handleReschedule(i)}
+                          className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                        >
+                          Reschedule
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               );
