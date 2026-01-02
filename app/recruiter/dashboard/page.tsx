@@ -2,30 +2,31 @@
 
 import ProtectedPage from "@/components/ProtectedPage";
 
-import RecentApplicants from "@/components/recruiter/RecentApplicants";
 import UpcomingInterviews from "@/components/recruiter/UpcomingInterviews";
 import ActiveJobs from "@/components/recruiter/ActiveJobs";
 import RecruiterStatsGrid from "@/components/dashboard/RecruiterStatsGrid";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { apiFetch } from "@/utils/api";
 import { RootState } from "@/redux/store";
-import { setRecruiterJobs } from "@/redux/slices/jobsSlice";
+import { fetchRecruiterJobs, setRecruiterJobs } from "@/redux/slices/jobsSlice";
 import { setRecruiterInterviewsCount } from "@/redux/slices/interviewSlice";
+import { useAppDispatch } from "@/redux/hooks";
 
 export default function RecruiterDashboard() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
   const [applicantsCount, setApplicantsCount] = useState<number>()
 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!user?._id) return;
+
+    dispatch(fetchRecruiterJobs(user._id));
+
     async function load() {
       try {
-        const jobResponse = await apiFetch(`job/employer/${user?.id}`, { method: "GET" });
-        const jobsData = await jobResponse.json();
-
         const appResposne = await apiFetch(`application/recruiter/total-applicants`, { method: "GET" });
         const applicantsData = await appResposne.json();
         setApplicantsCount(applicantsData?.count || 0);
@@ -34,7 +35,6 @@ export default function RecruiterDashboard() {
         const interviewData = await interviewResponse.json();
         const interviewCount = interviewData?.count || 0;
 
-        dispatch(setRecruiterJobs(jobsData.jobs));
         dispatch(setRecruiterInterviewsCount(interviewCount));
       } catch (error) {
         console.log(error);
@@ -45,9 +45,9 @@ export default function RecruiterDashboard() {
     }
 
     load()
-  }, [])
+  }, [user?._id])
 
-  if (loading) {
+  /*if (loading) {
     return (
       <ProtectedPage allowedRoles={["recruiter"]}>
         <main className="min-h-screen flex items-center justify-center text-xl text-gray-600">
@@ -55,7 +55,7 @@ export default function RecruiterDashboard() {
         </main>
       </ProtectedPage>
     );
-  }
+  }*/
 
   return (
     <ProtectedPage allowedRoles={["recruiter"]}>
@@ -69,9 +69,8 @@ export default function RecruiterDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* LEFT SECTION */}
           <div className="lg:col-span-2 flex flex-col gap-8">
-            <RecentApplicants />
-            <UpcomingInterviews />
             <ActiveJobs />
+            <UpcomingInterviews />
           </div>
 
           {/* RIGHT SECTION */}

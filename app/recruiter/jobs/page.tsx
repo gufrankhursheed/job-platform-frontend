@@ -23,7 +23,6 @@ export default function CreateJobPage() {
     description: "",
     requirements: [""],
     responsibilities: [""],
-    deadline: "",
   });
 
   const [errors, setErrors] = useState<any>({});
@@ -75,7 +74,6 @@ export default function CreateJobPage() {
     if (!form.description.trim())
       newErrors.description = "Description is required";
     if (!form.location.trim()) newErrors.location = "Location is required";
-    if (!form.deadline.trim()) newErrors.deadline = "Deadline is required";
 
     return newErrors;
   };
@@ -92,7 +90,7 @@ export default function CreateJobPage() {
     try {
       setSubmitting(true);
 
-      const res = await apiFetch("job/create", {
+      const res = await apiFetch("job/", {
         method: "POST",
         body: JSON.stringify(form),
       });
@@ -131,13 +129,13 @@ export default function CreateJobPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title */}
             <div>
-              <label className="font-semibold">Job Title</label>
+              <label className="text-gray-700 font-semibold">Job Title</label>
               <input
                 type="text"
                 name="title"
                 value={form.title}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg mt-1"
+                className="w-full px-4 py-2 border rounded-lg mt-1 text-gray-700"
               />
               {errors.title && (
                 <p className="text-red-600 text-sm">{errors.title}</p>
@@ -146,13 +144,13 @@ export default function CreateJobPage() {
 
             {/* Company Name */}
             <div>
-              <label className="font-semibold">Company Name</label>
+              <label className="text-gray-700 font-semibold">Company Name</label>
               <input
                 type="text"
                 name="companyName"
                 value={form.companyName}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg mt-1"
+                className="w-full px-4 py-2 border rounded-lg mt-1 text-gray-700"
               />
               {errors.companyName && (
                 <p className="text-red-600 text-sm">{errors.companyName}</p>
@@ -161,17 +159,18 @@ export default function CreateJobPage() {
 
             {/* Category */}
             <div>
-              <label className="font-semibold">Category</label>
+              <label className="text-gray-700 font-semibold">Category</label>
               <select
                 name="category"
                 value={form.category}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg mt-1"
+                className="w-full px-4 py-2 border rounded-lg mt-1 text-gray-700"
               >
                 <option value="">Select</option>
                 <option value="Software">Software</option>
                 <option value="Marketing">Marketing</option>
                 <option value="Design">Design</option>
+                <option value="Finance">Finance</option>
                 <option value="Business">Business</option>
               </select>
             </div>
@@ -179,13 +178,13 @@ export default function CreateJobPage() {
             {/* Location + Remote */}
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
-                <label className="font-semibold">Location</label>
+                <label className="text-gray-700 font-semibold">Location</label>
                 <input
                   type="text"
                   name="location"
                   value={form.location}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border rounded-lg mt-1"
+                  className="w-full px-4 py-2 border rounded-lg mt-1 text-gray-700"
                 />
                 {errors.location && (
                   <p className="text-red-600 text-sm">{errors.location}</p>
@@ -199,44 +198,44 @@ export default function CreateJobPage() {
                   onChange={handleToggleRemote}
                   className="h-5 w-5"
                 />
-                <label className="font-semibold">Remote</label>
+                <label className="text-gray-700 font-semibold">Remote</label>
               </div>
             </div>
 
             {/* Salary + Experience */}
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
-                <label className="font-semibold">Salary Range</label>
+                <label className="text-gray-700 font-semibold">Salary Range</label>
                 <input
                   type="text"
                   name="salaryRange"
                   value={form.salaryRange}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border rounded-lg mt-1"
+                  className="w-full px-4 py-2 border rounded-lg mt-1 text-gray-700"
                 />
               </div>
 
               <div className="flex-1">
-                <label className="font-semibold">Experience Level</label>
+                <label className="text-gray-700 font-semibold">Experience Level</label>
                 <input
                   type="text"
                   name="experienceLevel"
                   value={form.experienceLevel}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border rounded-lg mt-1"
+                  className="w-full px-4 py-2 border rounded-lg mt-1 text-gray-700"
                 />
               </div>
             </div>
 
             {/* Description */}
             <div>
-              <label className="font-semibold">Description</label>
+              <label className="text-gray-700 font-semibold">Description</label>
               <textarea
                 name="description"
                 rows={5}
                 value={form.description}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg mt-1"
+                className="w-full px-4 py-2 border rounded-lg mt-1 text-gray-700"
               />
               {errors.description && (
                 <p className="text-red-600 text-sm">{errors.description}</p>
@@ -245,7 +244,7 @@ export default function CreateJobPage() {
 
             {/* Requirements */}
             <div>
-              <label className="font-semibold">Requirements</label>
+              <label className="text-gray-700 font-semibold">Requirements</label>
               <div className="space-y-3 mt-2">
                 {form.requirements.map((req, index) => (
                   <div key={index} className="flex gap-3">
@@ -255,12 +254,12 @@ export default function CreateJobPage() {
                       onChange={(e) =>
                         updateList("requirements", index, e.target.value)
                       }
-                      className="flex-1 px-4 py-2 border rounded-lg"
+                      className="flex-1 px-4 py-2 border rounded-lg text-gray-700"
                     />
                     <button
                       type="button"
                       onClick={() => removeFromList("requirements", index)}
-                      className="bg-red-100 text-red-600 px-3 rounded-lg hover:bg-red-200"
+                      className="bg-red-100 text-red-600 px-3 rounded-lg hover:bg-red-200 cursor-pointer"
                     >
                       <FiTrash2 />
                     </button>
@@ -270,7 +269,7 @@ export default function CreateJobPage() {
                 <button
                   type="button"
                   onClick={() => addToList("requirements")}
-                  className="flex items-center gap-2 text-indigo-600 font-semibold"
+                  className="flex items-center gap-2 text-indigo-600 font-semibold cursor-pointer"
                 >
                   <FiPlus /> Add Requirement
                 </button>
@@ -279,7 +278,7 @@ export default function CreateJobPage() {
 
             {/* Responsibilities */}
             <div>
-              <label className="font-semibold">Responsibilities</label>
+              <label className="text-gray-700 font-semibold">Responsibilities</label>
               <div className="space-y-3 mt-2">
                 {form.responsibilities.map((res, index) => (
                   <div key={index} className="flex gap-3">
@@ -289,12 +288,12 @@ export default function CreateJobPage() {
                       onChange={(e) =>
                         updateList("responsibilities", index, e.target.value)
                       }
-                      className="flex-1 px-4 py-2 border rounded-lg"
+                      className="flex-1 px-4 py-2 border rounded-lg text-gray-700"
                     />
                     <button
                       type="button"
                       onClick={() => removeFromList("responsibilities", index)}
-                      className="bg-red-100 text-red-600 px-3 rounded-lg hover:bg-red-200"
+                      className="bg-red-100 text-red-600 px-3 rounded-lg hover:bg-red-200 cursor-pointer"
                     >
                       <FiTrash2 />
                     </button>
@@ -304,26 +303,11 @@ export default function CreateJobPage() {
                 <button
                   type="button"
                   onClick={() => addToList("responsibilities")}
-                  className="flex items-center gap-2 text-indigo-600 font-semibold"
+                  className="flex items-center gap-2 text-indigo-600 font-semibold cursor-pointer"
                 >
                   <FiPlus /> Add Responsibility
                 </button>
               </div>
-            </div>
-
-            {/* Deadline */}
-            <div>
-              <label className="font-semibold">Application Deadline</label>
-              <input
-                type="date"
-                name="deadline"
-                value={form.deadline}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg mt-1"
-              />
-              {errors.deadline && (
-                <p className="text-red-600 text-sm">{errors.deadline}</p>
-              )}
             </div>
 
             {/* Submit Button */}
@@ -331,7 +315,7 @@ export default function CreateJobPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 shadow-lg flex items-center gap-2 disabled:opacity-50"
+                className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 shadow-lg flex items-center gap-2 disabled:opacity-50 cursor-pointer"
               >
                 {submitting ? <FiLoader className="animate-spin" /> : null}
                 {submitting ? "Creating..." : "Create Job"}

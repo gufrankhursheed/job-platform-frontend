@@ -13,7 +13,7 @@ export default function ActiveJobs() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await apiFetch(`job/employer/${user?.id}?limit=5`, { method: "GET" });
+        const res = await apiFetch(`job/employer/${user?._id}?limit=5`, { method: "GET" });
         const data = await res.json();
 
         setJobs(data.jobs || []);
@@ -47,7 +47,7 @@ export default function ActiveJobs() {
 
       <button
         className="mt-5 text-indigo-600 font-semibold hover:underline cursor-pointer"
-        onClick={() => (window.location.href = "/recruiter/jobs")}
+        onClick={() => (window.location.href = "/recruiter/jobs/manage")}
       >
         Manage Jobs
       </button>

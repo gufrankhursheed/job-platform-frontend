@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import ProtectedPage from "@/components/ProtectedPage";
 import Link from "next/link";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { apiFetch } from "@/utils/api";
 
-import { removeJob, updateJobStatus } from "@/redux/slices/jobsSlice";
+import { fetchRecruiterJobs, removeJob, setRecruiterJobs, updateJobStatus } from "@/redux/slices/jobsSlice";
 import {
   FiEdit,
   FiUsers,
@@ -16,6 +16,7 @@ import {
   FiToggleRight,
   FiTrash2,
 } from "react-icons/fi";
+import { useAppDispatch } from "@/redux/hooks";
 
 type JobApplicationsMap = {
   [jobId: number]: number;
@@ -24,7 +25,8 @@ type JobApplicationsMap = {
 const PAGE_SIZE = 10;
 
 export default function ManageJobsPage() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const user = useSelector((state: RootState) => state.auth.user);
 
   // Redux store
   const activeJobs = useSelector((state: RootState) => state.jobs.activeJobs);
@@ -40,6 +42,30 @@ export default function ManageJobsPage() {
   // Pagination state
   const [activePage, setActivePage] = useState(1);
   const [closedPage, setClosedPage] = useState(1);
+
+  useEffect(() => {
+    if (!user?._id) return;
+    dispatch(fetchRecruiterJobs(user._id));
+  }, [user?._id, dispatch]);
+
+  /*useEffect(() => {
+    if (!user?._id) return;
+
+    async function loadJobs() {
+      try {
+        const res = await apiFetch(`job/employer/${user?._id}`, {
+          method: "GET",
+        });
+        const data = await res.json();
+
+        dispatch(setRecruiterJobs(data.jobs));
+      } catch (err) {
+        console.error("Failed to load jobs", err);
+      }
+    }
+
+    loadJobs();
+  }, [user?._id, dispatch]);*/
 
   const fetchApplicationCounts = async () => {
     try {
@@ -136,7 +162,7 @@ export default function ManageJobsPage() {
             </h1>
 
             <Link
-              href="/jobs/create"
+              href="/recruiter/jobs"
               className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold shadow hover:bg-indigo-700"
             >
               + Create Job
@@ -149,8 +175,8 @@ export default function ManageJobsPage() {
               onClick={() => setActiveTab("active")}
               className={`pb-2 font-semibold ${
                 activeTab === "active"
-                  ? "text-indigo-700 border-b-2 border-indigo-700"
-                  : "text-gray-500"
+                  ? "text-indigo-700 border-b-2 border-indigo-700 cursor-pointer"
+                  : "text-gray-500 cursor-pointer"
               }`}
             >
               Active Jobs
@@ -160,8 +186,8 @@ export default function ManageJobsPage() {
               onClick={() => setActiveTab("closed")}
               className={`pb-2 font-semibold ${
                 activeTab === "closed"
-                  ? "text-indigo-700 border-b-2 border-indigo-700"
-                  : "text-gray-500"
+                  ? "text-indigo-700 border-b-2 border-indigo-700 cursor-pointer"
+                  : "text-gray-500 cursor-pointer"
               }`}
             >
               Closed Jobs
@@ -182,7 +208,7 @@ export default function ManageJobsPage() {
                 key={job.id}
                 className="p-5 bg-white border rounded-xl shadow-sm hover:shadow-md transition"
               >
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div>
                     <h2 className="text-xl font-bold text-gray-800">
                       {job.title}
@@ -209,33 +235,37 @@ export default function ManageJobsPage() {
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap gap-2 md:gap-3">
                     <Link
-                      href={`/jobs/${job.id}/edit`}
-                      className="px-3 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100"
+                      href={`/recruiter/jobs/${job.id}/edit`}
+                      className="px-3 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 font-medium flex items-center gap-2"
                     >
+                      <span className="hidden md:block">Edit</span>
                       <FiEdit />
                     </Link>
 
                     <Link
                       href={`/jobs/${job.id}/applicants`}
-                      className="px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100"
+                      className="px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium flex items-center gap-2"
                     >
+                      <span className="hidden md:block">Applicants</span>
                       <FiUsers />
                     </Link>
 
                     {job.status === "open" ? (
                       <button
                         onClick={() => updateStatus(job.id, "closed")}
-                        className="px-3 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100"
+                        className="px-3 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 font-medium flex items-center gap-2 cursor-pointer"
                       >
+                        <span className="hidden md:block">Close</span>
                         <FiToggleLeft />
                       </button>
                     ) : (
                       <button
                         onClick={() => updateStatus(job.id, "open")}
-                        className="px-3 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100"
+                        className="px-3 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 font-medium flex items-center gap-2 cursor-pointer"
                       >
+                        <span className="hidden md:block">Activate</span>
                         <FiToggleRight />
                       </button>
                     )}
@@ -243,7 +273,7 @@ export default function ManageJobsPage() {
                     {/* DELETE BUTTON */}
                     <button
                       onClick={() => handleDelete(job.id)}
-                      className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium flex items-center gap-2"
+                      className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium flex items-center gap-2 cursor-pointer"
                     >
                       <FiTrash2 />
                       <span className="hidden md:block">Delete</span>
