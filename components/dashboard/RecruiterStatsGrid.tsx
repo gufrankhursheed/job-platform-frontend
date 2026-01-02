@@ -19,15 +19,7 @@ export default function RecruiterStatsGrid({applicants}: {applicants: number}) {
         value={jobs}
         icon={<FiBriefcase />}
         buttonLabel="Mange Jobs"
-        onClick={() => router.push("/recruiter/jobs")}
-      />
-
-      <DashboardCard
-        title="Total Applicants"
-        value={applicants}
-        icon={<FiUsers />}
-        buttonLabel="View Applicants"
-        onClick={() => router.push("/recruiter/applicants")}
+        onClick={() => router.push("/recruiter/jobs/manage")}
       />
 
       <DashboardCard
@@ -36,6 +28,14 @@ export default function RecruiterStatsGrid({applicants}: {applicants: number}) {
         icon={<FiCalendar />}
         buttonLabel="View Interviews"
         onClick={() => router.push("/recruiter/interviews")}
+      />
+
+      <DashboardCard
+        title="Total Applicants"
+        value={applicants}
+        icon={<FiUsers />}
+        buttonLabel="View Applicants"
+        onClick={() => router.push("/recruiter/applicants")}
       />
     </div>
   );
