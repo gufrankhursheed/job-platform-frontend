@@ -1,4 +1,5 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { apiFetch } from "@/utils/api";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface Job {
   id: number;
@@ -26,6 +27,38 @@ const initialState: JobsState = {
   activeJobs: [],
   closedJobs: [],
 };
+
+export const fetchSavedJobs = createAsyncThunk<{
+  ids: string[];
+  count: number;
+}>("jobs/fetchSavedJobs", async () => {
+  const res = await apiFetch("job/saved/", { method: "GET" });
+  const data = await res.json();
+
+  return {
+    ids: data.savedJobs?.map((job: any) => String(job.id)) || [],
+    count: data.pagination?.totalItems || 0,
+  };
+});
+
+export const fetchRecruiterJobs = createAsyncThunk<Job[], string>(
+  "jobs/fetchRecruiterJobs",
+  async (employerId, { rejectWithValue }) => {
+    try {
+      const res = await apiFetch(`job/employer/${employerId}`, {
+        method: "GET",
+      });
+
+      const data = await res.json();
+
+      return data.jobs || [];
+    } catch (error: any) {
+      return rejectWithValue(
+        error?.message || "Failed to fetch recruiter jobs"
+      );
+    }
+  }
+);
 
 const jobsSlice = createSlice({
   name: "jobs",
@@ -100,6 +133,35 @@ const jobsSlice = createSlice({
       state.totalJobsPosted = state.recruiterJobs.length;
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchSavedJobs.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchSavedJobs.fulfilled, (state, action) => {
+        state.loading = false;
+        state.savedJobs = action.payload.ids;
+        state.savedJobsCount = action.payload.count;
+      })
+      .addCase(fetchSavedJobs.rejected, (state) => {
+        state.loading = false;
+      })
+      
+      .addCase(fetchRecruiterJobs.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchRecruiterJobs.fulfilled, (state, action) => {
+        state.loading = false;
+
+        state.recruiterJobs = action.payload;
+        state.activeJobs = action.payload.filter((j) => j.status === "open");
+        state.closedJobs = action.payload.filter((j) => j.status === "closed");
+        state.totalJobsPosted = action.payload.length;
+      })
+      .addCase(fetchRecruiterJobs.rejected, (state) => {
+        state.loading = false;
+      });
+  },
 });
 
 export const {
@@ -112,6 +174,6 @@ export const {
   updateJobStatus,
   addNewJob,
   updateExistingJob,
-  removeJob
+  removeJob,
 } = jobsSlice.actions;
 export default jobsSlice.reducer;

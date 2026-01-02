@@ -1,4 +1,5 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { apiFetch } from "@/utils/api";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface ApplicationsSlice {
   loading: boolean | null;
@@ -13,6 +14,22 @@ const initialState: ApplicationsSlice = {
   appliedJobs: [],
 };
 
+export const fetchAppliedJobs = createAsyncThunk<
+  { ids: string[]; count: number },
+  string
+>("applications/fetchAppliedJobs", async (candidateId) => {
+  const res = await apiFetch(`application/candidate/${candidateId}`, {
+    method: "GET",
+  });
+
+  const data = await res.json();
+
+  return {
+    ids:  data.applications?.map((app: any) => String(app.job?.id)).filter(Boolean) || [],
+    count: data.pagination?.totalItems || 0,
+  };
+});
+
 const applicationsSlice = createSlice({
   name: "applications",
   initialState,
@@ -24,7 +41,7 @@ const applicationsSlice = createSlice({
       state.totalApplicants = action.payload;
     },
     setAppliedJobs: (state, action: PayloadAction<string[]>) => {
-      state.appliedJobs = action.payload; 
+      state.appliedJobs = action.payload;
     },
     addAppliedJob: (state, action: PayloadAction<string>) => {
       if (!state.appliedJobs.includes(action.payload)) {
@@ -33,8 +50,26 @@ const applicationsSlice = createSlice({
       }
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchAppliedJobs.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchAppliedJobs.fulfilled, (state, action) => {
+        state.loading = false;
+        state.appliedJobs = action.payload.ids;
+        state.applicationsCount = action.payload.count;
+      })
+      .addCase(fetchAppliedJobs.rejected, (state) => {
+        state.loading = false;
+      });
+  },
 });
 
-export const { setApplicationsCount, setTotalApplicants, setAppliedJobs, addAppliedJob } =
-  applicationsSlice.actions;
+export const {
+  setApplicationsCount,
+  setTotalApplicants,
+  setAppliedJobs,
+  addAppliedJob,
+} = applicationsSlice.actions;
 export default applicationsSlice.reducer;

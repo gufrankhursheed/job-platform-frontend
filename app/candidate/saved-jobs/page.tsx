@@ -23,7 +23,7 @@ export default function SavedJobsPage() {
   async function loadPage() {
     setLoading(true);
 
-    const res = await apiFetch(`saved-jobs?page=${page}&limit=${limit}`, {
+    const res = await apiFetch(`job/saved/?page=${page}&limit=${limit}`, {
       method: "GET",
     });
 
@@ -46,7 +46,7 @@ export default function SavedJobsPage() {
 
     // Optimistic UI
     setSavedJobs((prev) => prev.filter((job: any) => job.id !== jobId));
-    dispatch(removeSavedJob(jobId));
+    dispatch(removeSavedJob(jobId as string));
 
     await apiFetch(`saved-jobs/${jobId}`, { method: "DELETE" });
 

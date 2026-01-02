@@ -13,12 +13,17 @@ export default function JobsPage() {
   // Search + Filters
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "");
-  const [location, setLocation] = useState(searchParams.get("location") || "");
   const [remote, setRemote] = useState(searchParams.get("remote") || "");
 
   const [searchInput, setSearchInput] = useState(
     searchParams.get("search") || ""
   );
+
+  const [locationInput, setLocationInput] = useState(
+    searchParams.get("location") || ""
+  );
+
+  const [location, setLocation] = useState(searchParams.get("location") || "");
 
   // Pagination
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "1"));
@@ -52,6 +57,15 @@ export default function JobsPage() {
     return () => clearTimeout(timeout);
   }, [searchInput]);
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setLocation(locationInput);
+      setPage(1);
+    }, 500); // adjust delay if needed
+
+    return () => clearTimeout(timeout);
+  }, [locationInput]);
+
   // Fetch jobs on filter/page change
   useEffect(() => {
     async function load() {
@@ -82,7 +96,7 @@ export default function JobsPage() {
         <div className="flex justify-end mb-6">
           <button
             onClick={() => router.push("/candidate/saved-jobs")}
-            className="px-5 py-2 bg-indigo-600 text-white rounded-xl shadow hover:bg-indigo-700 transition font-semibold"
+            className="px-5 py-2 bg-indigo-600 text-white rounded-xl shadow hover:bg-indigo-700 transition font-semibold cursor-pointer"
           >
             Saved Jobs
           </button>
@@ -104,7 +118,7 @@ export default function JobsPage() {
               setSearch(searchInput);
               setPage(1);
             }}
-            className="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700 transition"
+            className="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700 transition cursor-pointer"
           >
             Search
           </button>
@@ -122,20 +136,18 @@ export default function JobsPage() {
             className="p-3 bg-white border border-gray-300 rounded-xl shadow text-gray-700"
           >
             <option value="">All Categories</option>
-            <option value="Engineering">Engineering</option>
-            <option value="Design">Design</option>
+            <option value="Software">Software</option>
             <option value="Marketing">Marketing</option>
+            <option value="Design">Design</option>
             <option value="Finance">Finance</option>
+            <option value="Business">Business</option>
           </select>
 
           {/* Location */}
           <input
             type="text"
-            value={location}
-            onChange={(e) => {
-              setLocation(e.target.value);
-              setPage(1);
-            }}
+            value={locationInput}
+            onChange={(e) => setLocationInput(e.target.value)}
             placeholder="Location"
             className="p-3 bg-white border border-gray-300 rounded-xl shadow text-gray-700"
           />
@@ -179,7 +191,7 @@ export default function JobsPage() {
 
                 <button
                   onClick={() => router.push(`/jobs/${job.id}`)}
-                  className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition"
+                  className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition cursor-pointer"
                 >
                   View Details
                 </button>
@@ -194,7 +206,7 @@ export default function JobsPage() {
             <button
               disabled={page === 1}
               onClick={() => setPage(page - 1)}
-              className="px-4 py-2 bg-white border border-gray-300 rounded-lg shadow hover:bg-gray-100 disabled:opacity-50"
+              className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-black shadow hover:bg-gray-100 disabled:opacity-50 cursor-pointer"
             >
               Previous
             </button>
@@ -202,7 +214,7 @@ export default function JobsPage() {
             <button
               disabled={page === pagination.totalPages}
               onClick={() => setPage(page + 1)}
-              className="px-4 py-2 bg-white border border-gray-300 rounded-lg shadow hover:bg-gray-100 disabled:opacity-50"
+              className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-black shadow hover:bg-gray-100 disabled:opacity-50 cursor-pointer"
             >
               Next
             </button>

@@ -3,19 +3,28 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { apiFetch } from "@/utils/api";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { addAppliedJob } from "@/redux/slices/applicationsSlice";
-import { addSavedJob, removeSavedJob } from "@/redux/slices/jobsSlice";
+import {
+  addAppliedJob,
+  fetchAppliedJobs,
+} from "@/redux/slices/applicationsSlice";
+import {
+  addSavedJob,
+  fetchSavedJobs,
+  removeSavedJob,
+} from "@/redux/slices/jobsSlice";
 
 import { FiSave, FiCheck, FiSend } from "react-icons/fi";
 import ProtectedPage from "@/components/ProtectedPage";
+import { useAppDispatch } from "@/redux/hooks";
 
 export default function JobDetailsPage() {
   const { jobId } = useParams();
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
+  const user = useSelector((state: RootState) => state.auth.user);
   const appliedJobs = useSelector(
     (state: RootState) => state.applications.appliedJobs
   );
@@ -28,6 +37,18 @@ export default function JobDetailsPage() {
 
   const isApplied = appliedJobs.includes(jobId as string);
   const isSaved = savedJobs.includes(jobId as string);
+
+  useEffect(() => {
+    if (!user?._id) return;
+
+    if (!appliedJobs.length) {
+      dispatch(fetchAppliedJobs(user._id));
+    }
+
+    if (!savedJobs.length) {
+      dispatch(fetchSavedJobs());
+    }
+  }, [user?._id, appliedJobs.length, savedJobs.length, dispatch]);
 
   // Fetch job details
   useEffect(() => {
@@ -54,7 +75,7 @@ export default function JobDetailsPage() {
     try {
       setApplying(true);
 
-      const res = await apiFetch(`application/apply`, {
+      const res = await apiFetch(`application/`, {
         method: "POST",
         body: JSON.stringify({ jobId }),
       });
@@ -79,11 +100,15 @@ export default function JobDetailsPage() {
     try {
       setSaving(true);
 
-      const endpoint = isSaved ? "job/unsave" : "job/save";
+      const endpoint = isSaved
+        ? `job/saved/${jobId}` // UNSAVE
+        : `job/saved`; // SAVE
+
+      const method = isSaved ? "DELETE" : "POST";
 
       const res = await apiFetch(endpoint, {
-        method: "POST",
-        body: JSON.stringify({ jobId }),
+        method,
+        body: isSaved ? undefined : JSON.stringify({ jobId }),
       });
 
       const data = await res.json();
@@ -150,8 +175,8 @@ export default function JobDetailsPage() {
                 disabled={isApplied || applying}
                 className={`px-5 py-2 rounded-lg font-semibold shadow text-white transition flex items-center gap-2 ${
                   isApplied
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-indigo-600 hover:bg-indigo-700"
+                    ? "bg-gray-400 text-white"
+                    : "bg-indigo-600 hover:bg-indigo-700 cursor-pointer"
                 }`}
               >
                 {isApplied ? <FiCheck /> : <FiSend />}
@@ -161,11 +186,11 @@ export default function JobDetailsPage() {
               {/* SAVE */}
               <button
                 onClick={handleSave}
-                disabled={saving}
+                disabled={isSaved || saving}
                 className={`px-4 py-2 rounded-lg font-semibold shadow flex items-center gap-2 transition ${
                   isSaved
-                    ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                    : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+                    ? "bg-gray-400 text-white"
+                    : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100 cursor-pointer"
                 }`}
               >
                 <FiSave />

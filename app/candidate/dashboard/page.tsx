@@ -6,56 +6,51 @@ import StatsGrid from "@/components/dashboard/CandidateStatsGrid";
 import ProtectedPage from "@/components/ProtectedPage";
 import { apiFetch } from "@/utils/api";
 import Link from "next/link";
-import { useDispatch, useSelector } from "react-redux";
-import { setAppliedJobs } from "@/redux/slices/applicationsSlice";
-import { setSavedJobs } from "@/redux/slices/jobsSlice";
+import { useSelector } from "react-redux";
+import { fetchAppliedJobs } from "@/redux/slices/applicationsSlice";
+import { fetchSavedJobs } from "@/redux/slices/jobsSlice";
 import { RootState } from "@/redux/store";
+import { useAppDispatch } from "@/redux/hooks";
 
 export default function CandidateDashboard() {
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
+
+  const appliedJobsCount = useSelector(
+    (state: RootState) => state.applications.applicationsCount
+  );
+  const savedJobsCount = useSelector(
+    (state: RootState) => state.jobs.savedJobsCount
+  );
 
   const [loading, setLoading] = useState(true);
 
-  const [stats, setStats] = useState({
-    applications: 0,
-    interviews: 0,
-    savedJobs: 0,        
-  });
+  const [interviewsCount, setInterviewsCount] = useState(0);
 
   const [jobs, setJobs] = useState([]);
 
   useEffect(() => {
+    if (!user?._id) return;
+
+    dispatch(fetchAppliedJobs(user._id));
+    dispatch(fetchSavedJobs());
+
     async function loadDashboard() {
       try {
-        const app = await apiFetch(`application/candidate/${user?.id}`, { method: "GET" });
-        const applications = await app.json();
-        const appliedJobIds = applications.jobs?.map((job: any) => job.id) || [];
-        const applicationCount = applications.pagination?.totalItems || 0;
-
-        const int = await apiFetch(`interview/candidate/${user?.id}`, { method: "GET" });
+        const int = await apiFetch(`interview/candidate/${user?._id}`, {
+          method: "GET",
+        });
         const interviews = await int.json();
         const interviewCount = interviews.pagination?.totalItems || 0;
 
-        const saved = await apiFetch("job/saved", { method: "GET" }); 
-        const savedJobs = await saved.json();
-        const savedJobIds = savedJobs.savedJobs?.map((job: any) => job.id) || [];
-        const savedJobsCount = savedJobs.pagination?.totalItems || 0;
-
-        const jobsList = await apiFetch("jobs?limit=5", { method: "GET" });
+        const jobsList = await apiFetch("job?limit=5", { method: "GET" });
         const jobs = await jobsList.json();
 
-        setStats({
-          applications: applicationCount || 0,
-          interviews: interviewCount || 0,
-          savedJobs: savedJobsCount || 0,
-        });
-
+        setInterviewsCount(
+          interviews.pagination?.totalItems || 0
+        );
         setJobs(jobs.jobs || []);
-
-        dispatch(setAppliedJobs(appliedJobIds));
-        dispatch(setSavedJobs(savedJobIds));
       } catch (err) {
         console.log(err);
       } finally {
@@ -64,9 +59,9 @@ export default function CandidateDashboard() {
     }
 
     loadDashboard();
-  }, []);
+  }, [user?._id, dispatch]);
 
-  if (loading) {
+  /*if (loading) {
     return (
       <ProtectedPage allowedRoles={["candidate"]}>
         <main className="min-h-screen flex items-center justify-center text-xl text-gray-600">
@@ -74,7 +69,7 @@ export default function CandidateDashboard() {
         </main>
       </ProtectedPage>
     );
-  }
+  }*/
 
   return (
     <ProtectedPage allowedRoles={["candidate"]}>
@@ -84,7 +79,6 @@ export default function CandidateDashboard() {
         </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
           {/* LEFT — Recent Jobs */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
@@ -105,7 +99,7 @@ export default function CandidateDashboard() {
                         className="hover:underline"
                         href={`/jobs/${job.id}`}
                       >
-                        • {job.title} — {job.company}
+                        • {job.title} — {job.companyName}
                       </Link>
                     </li>
                   ))}
@@ -124,9 +118,9 @@ export default function CandidateDashboard() {
           {/* RIGHT — Stats Grid */}
           <div>
             <StatsGrid
-             applications= {stats.applications}
-             interviews =  {stats.interviews}
-             savedJobs= {stats.savedJobs}
+              applications={appliedJobsCount}
+              interviews={interviewsCount}
+              savedJobs={savedJobsCount}
             />
           </div>
         </div>
